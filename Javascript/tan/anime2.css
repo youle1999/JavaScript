@@ -1,0 +1,17 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #282c34;
+    color: #ffffff;
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+}
+
+#animatedText {
+    opacity: 0; /* 初期状態ではテキストを見せない */
+    font-size: 10rem; /* this will be the size of the text or image*/
+    font-weight: bold;
+}

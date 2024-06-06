@@ -1,0 +1,25 @@
+/* ゲームのコンテナを中央に配置し、固定サイズを指定する */
+#gameContainer {
+    position: relative; /* 子要素の位置を絶対位置で指定するために必要 */
+    width: 800px; /* コンテナの幅 */
+    height: 600px; /* コンテナの高さ */
+    background-color: #327ceb; /* コンテナの背景色 */
+    overflow: hidden; /* コンテナの外に要素がはみ出さないように */
+    margin: 20px auto; /* 上下のマージンは20px、左右は自動で中央揃え */
+}
+
+/* バルーンの基本的なスタイル */
+.balloon {
+    position: absolute; /* 親要素（gameContainer）を基準に絶対位置を指定 */
+    width: 50px; /* バルーンの幅 */
+    height: 70px; /* バルーンの高さ */
+    background-color: red; /* バルーンの色 */
+    border-radius: 50%; /* 角を丸くして円形に見せる */
+    cursor: pointer; /* マウスカーソルをハンドアイコンに変更する */
+    /* user-select: none; */ /* テキストを選択できなくする */
+}
+
+/* バルーンにマウスカーソルが乗ったときのスタイル */
+.balloon:hover {
+    opacity: 0.9; /* バルーンにマウスが乗ると少し透明にする */
+}
