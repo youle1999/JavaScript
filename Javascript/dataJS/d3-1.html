@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- D3.jsライブラリを読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+      /* バーにマウスを乗せたときの効果 */
+      .bar:hover {
+        filter: brightness(1.2); /* 明るくする */
+        transition: all 0.3s; /* 効果をなめらかにする */
+        transform: scale(1.1); /* 少し⼤きくする */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- グラフを表⽰するためのエリア -->
+    <div id="chart"></div>
+    <script>
+      // データの準備（カテゴリ名と数値のセット）
+      const data = [
+        { name: "🎮  ゲーム", value: 80 },
+        { name: "📱  SNS", value: 65 },
+        { name: "📺  動画", value: 90 },
+        { name: "🎵  ⾳楽", value: 70 },
+      ];
+
+      // SVG（描画エリア）の作成
+      const svg = d3
+        .select("#chart") // id="chart"の要素を選ぶ
+        .append("svg") // svg要素を追加
+        .attr("width", 400) // 横幅を設定
+        .attr("height", 300); // ⾼さを設定
+
+      // バーに使うカラフルな⾊
+      const colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"];
+
+      // X軸のスケール（カテゴリの配置）
+      const x = d3
+        .scaleBand() // カテゴリごとにスペースを割り当てる
+        .range([50, 350]) // グラフの横幅を設定
+        .domain(data.map((d) => d.name)) // カテゴリ名をスケールに登録
+        .padding(0.3); // バーの間にスペースを作る
+
+      // Y軸のスケール（数値の範囲）
+      const y = d3
+        .scaleLinear() // 数値をY軸に対応させる
+        .range([250, 30]) // 画⾯下から上に向かう配置
+        .domain([0, 100]); // データの最⼩値と最⼤値
+
+      // バーを描画
+      svg
+        .selectAll("rect") // 四⾓形を選択（まだ無いので空の状態）
+        .data(data) // データをバインド（関連付ける）
+        .enter() // データの数だけ四⾓形を作る
+        .append("rect") // 四⾓形（バー）を追加
+        .attr("class", "bar") // CSSの設定を適⽤するためのクラス
+        .attr("x", (d) => x(d.name)) // バーの横位置を設定
+        .attr("width", x.bandwidth()) // バーの横幅を設定
+        .attr("fill", (d, i) => colors[i]) // バーの⾊をデータに基づいて設定
+        .attr("height", 0) // 初期状態では⾼さを0にする（アニメーション⽤）
+        .attr("y", 250) // 初期位置をグラフの下端に設定
+        .transition() // アニメーションを開始
+        .duration(1000) // アニメーションの時間（1秒）
+        .attr("y", (d) => y(d.value)) // データに基づいてバーを動かす
+        .attr("height", (d) => 250 - y(d.value)); // バーの⾼さをデータに基づいて設定
+
+      // 数値ラベルを追加（バーの上に表⽰）
+      svg
+        .selectAll(".label") // テキスト要素を選択（まだ無いので空の状態）
+        .data(data) // データをバインド
+        .enter() // データの数だけテキスト要素を作る
+        .append("text") // テキスト要素を追加
+        .attr("class", "label") // CSSの設定を適⽤するためのクラス
+        .attr("x", (d) => x(d.name) + x.bandwidth() / 2) // テキストの横位置をバーの中央に
+        .attr("y", (d) => y(d.value) - 5) // テキストの縦位置をバーの上に
+        .attr("text-anchor", "middle") // テキストを中央揃え
+        .style("font-size", "16px") // ⽂字サイズを設定
+        .style("opacity", 0) // 初期状態では⾮表⽰（アニメーション⽤）
+        .transition() // アニメーションを開始
+        .duration(1000) // アニメーションの時間（1秒）
+        .style("opacity", 1) // 最終的に表⽰
+        .text((d) => d.value + "%"); // データの値を表⽰
+
+      // カテゴリ名をバーの下に表⽰
+      svg
+        .selectAll(".name") // テキスト要素を選択（まだ無いので空の状態）
+        .data(data) // データをバインド
+        .enter() // データの数だけテキスト要素を作る
+        .append("text") // テキスト要素を追加
+        .attr("class", "name") // CSSの設定を適⽤するためのクラス
+        .attr("x", (d) => x(d.name) + x.bandwidth() / 2) // テキストの横位置をバーの中央に
+        .attr("y", 270) // テキストの縦位置をバーの下に
+        .attr("text-anchor", "middle") // テキストを中央揃え
+        .style("font-size", "14px") // ⽂字サイズを設定
+        .text((d) => d.name); // カテゴリ名を表⽰
+    </script>
+  </body>
+</html>

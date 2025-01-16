@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- D3.jsライブラリをインポート -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+      /* ページ全体の設定 */
+      body {
+        margin: 0; /* 余白をゼロにする */
+        overflow: hidden; /* スクロールバーが出ないようにする */
+        background: #0f172a; /* 背景色を暗い青にする */
+      }
+      .bubble {
+        cursor: pointer; /* バブルにマウスを乗せると指カーソルになる */
+        transition: all 0.3s ease; /* アニメーションの動きをなめらかにする */
+      }
+      .bubble:hover {
+        filter: brightness(1.2); /* マウスを乗せたとき少し明るくする */
+      }
+      text {
+        fill: rgba(255, 255, 255, 0.9); /* 文字色を白に近い色にする */
+        font-size: 14px; /* 文字サイズを設定 */
+        font-weight: 500; /* 文字の太さを中くらいにする */
+        letter-spacing: 0.5px; /* 文字の間隔を少し広げる */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- グラフを表示するエリア -->
+    <div id="canvas"></div>
+    <script>
+      // バブルに表示するデータ
+      const data = [
+        { name: "💼  #副業", size: 120 },
+        { name: "🍜  #ラーメン", size: 150 },
+        { name: "✈  #旅行", size: 100 },
+        { name: "📱  #転職", size: 130 },
+        { name: "🎮  #ゲーム", size: 140 },
+      ];
+
+      // ウィンドウサイズを取得
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      // SVG（描画領域）を作成
+      const svg = d3
+        .select("#canvas")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+      // バブルの色を設定
+      const colors = ["#818cf8", "#38bdf8", "#34d399", "#a78bfa", "#f472b6"];
+
+      // バブルが動くシミュレーションを設定
+      const simulation = d3
+        .forceSimulation(data)
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("charge", d3.forceManyBody().strength(50))
+        .force("collision", d3.forceCollide().radius((d) => d.size + 10));
+
+      // グラデーションを定義
+      const gradients = svg
+        .append("defs")
+        .selectAll("linearGradient")
+        .data(data)
+        .enter()
+        .append("linearGradient")
+        .attr("id", (d, i) => `gradient-${i}`)
+        .attr("gradientTransform", "rotate(45)");
+
+      gradients
+        .append("stop")
+        .attr("offset", "0%")
+        .attr("stop-color", (d, i) => colors[i])
+        .attr("stop-opacity", 0.8);
+
+      gradients
+        .append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", (d, i) => d3.rgb(colors[i]).darker(0.5))
+        .attr("stop-opacity", 0.6);
+
+      // バブルを作成
+      const bubbles = svg
+        .selectAll(".bubble")
+        .data(data)
+        .enter()
+        .append("g")
+        .attr("class", "bubble");
+
+      // バブル（円）を描画
+      bubbles
+        .append("circle")
+        .attr("r", (d) => d.size)
+        .style("fill", (d, i) => `url(#gradient-${i})`)
+        .style("stroke", (d, i) => colors[i])
+        .style("stroke-width", "1px")
+        .style("stroke-opacity", 0.3)
+        .on("mouseover", function (event, d) {
+          d3.select(this)
+            .transition()
+            .duration(400)
+            .ease(d3.easeCubicOut)
+            .attr("r", d.size * 1.1)
+            .style("stroke-opacity", 0.8);
+        })
+        .on("mouseout", function (event, d) {
+          d3.select(this)
+            .transition()
+            .duration(400)
+            .ease(d3.easeCubicOut)
+            .attr("r", d.size)
+            .style("stroke-opacity", 0.3);
+        })
+        .on("click", function (event, d) {
+          d3.select(this)
+            .transition()
+            .duration(300)
+            .attr("r", d.size * 1.2)
+            .transition()
+            .duration(300)
+            .attr("r", d.size);
+        });
+
+      // バブル内に文字を表示
+      bubbles
+        .append("text")
+        .text((d) => d.name)
+        .attr("text-anchor", "middle")
+        .attr("dy", "0.35em")
+        .style("font-size", "16px")
+        .style("font-weight", "500")
+        .style("pointer-events", "none")
+        .style("opacity", 0.9);
+
+      // バブルが動くたびに位置を更新
+      simulation.on("tick", () => {
+        bubbles.attr("transform", (d) => `translate(${d.x},${d.y})`);
+      });
+
+      // ウィンドウサイズが変わったときにSVGを調整
+      window.addEventListener("resize", () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        svg.attr("width", width).attr("height", height);
+        simulation.force("center", d3.forceCenter(width / 2, height / 2));
+      });
+    </script>
+  </body>
+</html>
